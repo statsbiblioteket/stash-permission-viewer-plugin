@@ -5,13 +5,18 @@
  * @param projectAdmin list of project level group and user admin
  * @param projectWrite list of project level group and user write
  * @param projectRead list of project level group and user read
+ * @param? authenticated boolean indicating whether to display with project decorator 
  */
 {template .projectPermissionsTab}
 <html>
 <head>
+    {if ($authenticated)}
     <meta name="decorator" content="bitbucket.project.general">
     <meta name="activeTab" content="project-permissions-tab">
     <meta name="projectKey" content="{$project.key}">
+    {else}
+    <meta name="decorator" content="bitbucket.focused.xlarge">
+    {/if}
     <title>{$project.name} Ownership Info</title>
 </head>
 <body>
@@ -34,14 +39,19 @@
 * @param repositoryAdmin list of repository level group and user admins
 * @param repositoryWrite list of repository level group and user write
 * @param repositoryRead list of repository level group and user read
+* @param? authenticated boolean indicating whether to display with project decorator 
 */
 {template .repositoryPermissionsTab}
 <html>
 <head>
+  {if ($authenticated)}
   <meta name="decorator" content="bitbucket.repository.general">
   <meta name="activeTab" content="repository-permissions-tab">
   <meta name="projectKey" content="{$repository.project.key}">
   <meta name="repositorySlug" content="{$repository.slug}">
+  {else}
+  <meta name="decorator" content="bitbucket.focused.xlarge">
+  {/if}
   <title>{$repository.name} Ownership Info</title>
 </head>
 <body>
@@ -110,4 +120,61 @@
     {if not isFirst($item)}, {/if}{$item}
     {if isLast($item)}</td></tr>{/if}
   {/foreach}
+{/template}
+
+
+/**
+ * @param repositoriesWithoutPermission Set of Repository objects which is in the context provided by ProjectWithoutPermissionPanel
+ */
+{template .repositoriesWithoutPermissionPage}
+<html>
+<head>
+    <meta name="decorator" content="atl.general">
+    <title>Repositories You Can't Access</title>
+</head>
+<body>
+    <header class="aui-page-header">
+        <section class="notifications"></section>
+        <div class="aui-page-header-inner">
+            <div class="aui-page-header-main entity-item">
+                <h1><span class="entity-name">Repositories You Can't Access</span></h1>
+            </div>
+            <div class="aui-page-header-actions"></div>
+        </div>
+    </header>
+    <div class="aui-page-panel content-body fixed-right" id="aui-page-panel-content-body">
+      <div class="aui-page-panel-inner">
+        <section class="aui-page-panel-content">
+        {call .repositoryTable}
+            {param repositories: $repositoriesWithoutPermission /}
+        {/call}
+        </section>
+      </div>
+    </div>
+</body>
+</html> 
+{/template}
+
+/**
+ * Outputs a table of repositories 
+ *
+ * @param repositories List of repositories
+ */
+{template .repositoryTable}
+  <table class="aui">
+    <thead><tr>
+      <th>Project</th>
+      <th>Repository</th>
+    </tr></thead>
+    {foreach $repository in $repositories}
+      <tr>
+        <td class="repository-name">
+          <a href="/plugins/servlet/projectpermissions/{$repository.project.key}">{$repository.project.name}</a>
+        </td>
+        <td class="repository-name">
+          <a href="/plugins/servlet/repositorypermissions/{$repository.id}">{$repository.name}</a>
+        </td>
+      </tr>
+    {/foreach}
+  </table><br/>
 {/template}

@@ -9,8 +9,9 @@ import com.atlassian.soy.renderer.SoyException;
 import com.atlassian.soy.renderer.SoyTemplateRenderer;
 import com.atlassian.bitbucket.project.Project;
 import com.atlassian.bitbucket.project.ProjectService;
-import com.atlassian.bitbucket.permission.PermissionAdminService;
 import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.permission.PermissionService;
+import com.atlassian.bitbucket.permission.PermissionAdminService;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.user.UserService;
 import com.google.common.collect.ImmutableList;
@@ -39,6 +40,8 @@ public class ProjectPermissionsServlet extends HttpServlet{
     @ComponentImport
     private final PermissionAdminService permissionAdminService;
     @ComponentImport
+    private final PermissionService permissionService;
+    @ComponentImport
     private final UserService userService;
     @ComponentImport
     private final SoyTemplateRenderer soyTemplateRenderer;
@@ -48,12 +51,14 @@ public class ProjectPermissionsServlet extends HttpServlet{
         ProjectService projectService,
         SecurityService securityService,
         PermissionAdminService permissionAdminService,
+        PermissionService permissionService,
         UserService userService,
         SoyTemplateRenderer soyTemplateRenderer
     ) {
         this.projectService = projectService;
         this.securityService = securityService;
         this.permissionAdminService = permissionAdminService;
+        this.permissionService = permissionService;
         this.userService = userService;
         this.soyTemplateRenderer = soyTemplateRenderer;
     }
@@ -65,7 +70,10 @@ public class ProjectPermissionsServlet extends HttpServlet{
         String pathInfo = req.getPathInfo();
 
         String projectKey = pathInfo.substring(1); // Strip leading slash
-        Project project = projectService.getByKey(projectKey);
+        ProjectGetByKeyOperation projectGetByKeyOperation = new ProjectGetByKeyOperation(projectService, projectKey);
+        Project project = securityService
+            .withPermission(Permission.PROJECT_VIEW, "Get project info")
+            .call(projectGetByKeyOperation);
 
         //
         // Need to wrap all of the permission access in an operation called by the security service
@@ -84,16 +92,24 @@ public class ProjectPermissionsServlet extends HttpServlet{
 
         immutableMapBuilder.
                 put("project", project).
+                put("authenticated", this.permissionService.isProjectAccessible(project)).
                 put("projectAdmin", ImmutableList.copyOf(identityMap.get(Permission.PROJECT_ADMIN))).
                 put("projectWrite", ImmutableList.copyOf(identityMap.get(Permission.PROJECT_WRITE))).
                 put("projectRead", ImmutableList.copyOf(identityMap.get(Permission.PROJECT_READ)));
 
         // Now render the tab
-        render(resp, "plugin.permissionviewer.projectPermissionsTab", immutableMapBuilder.build());
+        ProjectPermissionsServlet.render(
+            this.soyTemplateRenderer, resp, "plugin.permissionviewer.projectPermissionsTab", immutableMapBuilder.build()
+        );
     }
 
     // Generic soy render method
-    private void render(HttpServletResponse resp, String templateName, Map<String, Object> data) throws IOException, ServletException {
+    public static void render(
+        SoyTemplateRenderer soyTemplateRenderer,
+        HttpServletResponse resp,
+        String templateName,
+        Map<String, Object> data
+    ) throws IOException, ServletException {
         resp.setContentType("text/html;charset=UTF-8");
         try {
             soyTemplateRenderer.render(resp.getWriter(),

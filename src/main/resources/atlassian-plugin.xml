@@ -32,6 +32,12 @@
         </description>
         <url-pattern>/repositorypermissions/*</url-pattern>
     </servlet>
+    <servlet name="Without Permission Servlet" i18n-name-key="without-permissions-servlet.name"
+             key="without-permissions-servlet" class="com.orbitz.stash.plugins.pvp.servlet.WithoutPermissionServlet">
+        <description key="projects-without-permission-servlet.description">Without Permission Servlet Plugin</description>
+        <url-pattern>/withoutpermissions</url-pattern>
+    </servlet>
+
     <web-item key="project-permissions-tab" name="Project permissions tab" section="atl.project.nav" weight="100">
         <label key="project.permissions.plugin.tab">View Permissions</label>
         <link>/plugins/servlet/projectpermissions/${project.key}</link>
@@ -43,6 +49,12 @@
         <link>/plugins/servlet/repositorypermissions/${repository.id}</link>
         <tooltip key="repository.permissions.plugin.tab.description">View Permissions</tooltip>
         <param name="iconClass">aui-icon aui-icon-small aui-iconfont-unlocked</param>
+    </web-item>
+
+    <web-item key="projects-without-permission-action" name="Projects Without Permission Action" section="repositories-menu/public-repo-list-link-section"
+               weight="100">
+        <label>View restricted repositories</label>
+        <link>/plugins/servlet/withoutpermissions</link>
     </web-item>
 
     <client-resource key="soy-templates" name="Soy Templates">

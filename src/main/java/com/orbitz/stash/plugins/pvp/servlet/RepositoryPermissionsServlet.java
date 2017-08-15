@@ -1,5 +1,7 @@
 package com.orbitz.stash.plugins.pvp.servlet;
 
+import com.orbitz.stash.plugins.pvp.operations.*;
+
 import com.atlassian.plugin.spring.scanner.annotation.component.Scanned;
 import com.atlassian.plugin.spring.scanner.annotation.imports.ComponentImport;
 
@@ -10,12 +12,12 @@ import com.atlassian.bitbucket.project.ProjectService;
 import com.atlassian.bitbucket.repository.Repository;
 import com.atlassian.bitbucket.repository.RepositoryService;
 import com.atlassian.bitbucket.permission.Permission;
+import com.atlassian.bitbucket.permission.PermissionService;
 import com.atlassian.bitbucket.permission.PermissionAdminService;
 import com.atlassian.bitbucket.user.SecurityService;
 import com.atlassian.bitbucket.user.UserService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.orbitz.stash.plugins.pvp.operations.PermissionAdminOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,6 +42,8 @@ public class RepositoryPermissionsServlet extends HttpServlet{
     @ComponentImport
     private final PermissionAdminService permissionAdminService;
     @ComponentImport
+    private final PermissionService permissionService;
+    @ComponentImport
     private final UserService userService;
     @ComponentImport
     private final SoyTemplateRenderer soyTemplateRenderer;
@@ -50,11 +54,13 @@ public class RepositoryPermissionsServlet extends HttpServlet{
         SecurityService securityService,
         PermissionAdminService permissionAdminService,
         UserService userService,
+        PermissionService permissionService,
         SoyTemplateRenderer soyTemplateRenderer
     ) {
         this.repositoryService = repositoryService;
         this.securityService = securityService;
         this.permissionAdminService = permissionAdminService;
+        this.permissionService = permissionService;
         this.userService = userService;
         this.soyTemplateRenderer = soyTemplateRenderer;
     }
@@ -66,7 +72,10 @@ public class RepositoryPermissionsServlet extends HttpServlet{
         String pathInfo = req.getPathInfo();
 
         String repositoryId = pathInfo.substring(1); // Strip leading slash
-        Repository repository = repositoryService.getById(Integer.valueOf(repositoryId));
+        RepositoryGetByIdOperation repositoryGetByIdOperation = new RepositoryGetByIdOperation(repositoryService, Integer.valueOf(repositoryId));
+        Repository repository = securityService
+            .withPermission(Permission.PROJECT_ADMIN, "Get repository info")
+            .call(repositoryGetByIdOperation);
 
         //
         // Need to wrap all of the permission access in an operation called by the security service
@@ -86,6 +95,7 @@ public class RepositoryPermissionsServlet extends HttpServlet{
 
         immutableMapBuilder.
                 put("repository", repository).
+                put("authenticated", this.permissionService.isRepositoryAccessible(repository)).
                 put("repositoryAdmin", ImmutableList.copyOf(identityMap.get(Permission.REPO_ADMIN))).
                 put("repositoryWrite", ImmutableList.copyOf(identityMap.get(Permission.REPO_WRITE))).
                 put("repositoryRead", ImmutableList.copyOf(identityMap.get(Permission.REPO_READ))).
@@ -94,23 +104,8 @@ public class RepositoryPermissionsServlet extends HttpServlet{
                 put("projectRead", ImmutableList.copyOf(identityMap.get(Permission.PROJECT_READ)));
 
         // Now render the tab
-        render(resp, "plugin.permissionviewer.repositoryPermissionsTab", immutableMapBuilder.build());
-    }
-
-    // Generic soy render method
-    private void render(HttpServletResponse resp, String templateName, Map<String, Object> data) throws IOException, ServletException {
-        resp.setContentType("text/html;charset=UTF-8");
-        try {
-            soyTemplateRenderer.render(resp.getWriter(),
-                    "com.orbitz.stash.plugins.permission-viewer-plugin:soy-templates",
-                    templateName,
-                    data);
-        } catch (SoyException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
-            }
-            throw new ServletException(e);
-        }
+        ProjectPermissionsServlet.render(
+            this.soyTemplateRenderer, resp, "plugin.permissionviewer.repositoryPermissionsTab", immutableMapBuilder.build()
+        );
     }
 }
