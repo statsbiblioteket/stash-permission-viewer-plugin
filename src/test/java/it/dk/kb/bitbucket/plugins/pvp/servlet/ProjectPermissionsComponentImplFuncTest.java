@@ -1,4 +1,4 @@
-package it.com.orbitz.bitbucket.plugins.pvp.servlet;
+package it.dk.kb.bitbucket.plugins.pvp.servlet;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import static org.junit.Assert.*;
 
 
-public class ProjectPermissionsServletFuncTest {
+public class ProjectPermissionsComponentImplFuncTest {
 
     HttpClient httpClient;
     String baseUrl;

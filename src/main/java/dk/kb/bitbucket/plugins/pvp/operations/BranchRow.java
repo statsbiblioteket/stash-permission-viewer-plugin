@@ -1,4 +1,4 @@
-package com.orbitz.bitbucket.plugins.pvp.operations;
+package dk.kb.bitbucket.plugins.pvp.operations;
 
 
 import java.util.ArrayList;

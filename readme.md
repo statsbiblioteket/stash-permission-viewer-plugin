@@ -11,7 +11,7 @@ Groups with permissions are expanded out to show group name and user membership.
 
 ## Installing the Plugin
 
-[Download](https://marketplace.atlassian.com/plugins/com.orbitz.bitbucket.plugins.permission-viewer-plugin "Permission Viewer Plugin") the plugin from the Atlassian Marketplace.
+[Download](https://marketplace.atlassian.com/plugins/dk.kb.bitbucket.plugins.permission-viewer-plugin "Permission Viewer Plugin") the plugin from the Atlassian Marketplace.
 
 The plugin can be installed via UPM by navigating to Administration > Plugins & Apps > Plugins. Go to "Install" tab and use "Upload Plugin" option to upload the plugin if it cannot be found on Atlassian Marketplace. Or use the install option if the plugin is found on Marketplace.
 Once the plugin is installed an "View Permissions" tab will display in the project and repository tab panels.

@@ -1,4 +1,4 @@
-package com.orbitz.bitbucket.plugins.pvp.operations;
+package dk.kb.bitbucket.plugins.pvp.operations;
 
 import com.atlassian.bitbucket.permission.Permission;
 import com.atlassian.bitbucket.permission.PermissionAdminService;
@@ -6,13 +6,18 @@ import com.atlassian.bitbucket.permission.PermittedGroup;
 import com.atlassian.bitbucket.permission.PermittedUser;
 import com.atlassian.bitbucket.project.Project;
 import com.atlassian.bitbucket.repository.Repository;
-import com.atlassian.bitbucket.user.*;
+import com.atlassian.bitbucket.user.ApplicationUser;
+import com.atlassian.bitbucket.user.UserService;
 import com.atlassian.bitbucket.util.Page;
 import com.atlassian.bitbucket.util.PageRequest;
 import com.atlassian.bitbucket.util.PageRequestImpl;
 import com.atlassian.bitbucket.util.UncheckedOperation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -107,7 +112,7 @@ public class PermissionAdminOperation implements UncheckedOperation<Map<Permissi
         ArrayList<String> userList = new ArrayList<String>();
 
         for (ApplicationUser appUser : appUserPage.getValues()) {
-            userList.add(appUser.getDisplayName());
+            userList.add(""+appUser.getDisplayName());
         }
         builder.append(Arrays.toString(userList.toArray()));
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<atlassian-plugin key="com.orbitz.stash.plugins.permission-viewer-plugin" name="${project.name}" plugins-version="2">
+<atlassian-plugin key="${atlassian.plugin.key}" name="${project.name}" plugins-version="2">
     <plugin-info>
         <description>${project.description}</description>
         <version>${project.version}</version>
@@ -19,23 +19,26 @@
         <resource type="download" name="images/" location="/images"/>
         <context>permission-viewer-plugin</context>
     </web-resource>
-    <!-- import from the product container -->
-    <component-import key="projectService" interface="com.atlassian.bitbucket.project.ProjectService" filter=""/>
-    <component-import key="repositoryService" interface="com.atlassian.bitbucket.repository.RepositoryService" filter=""/>
-    <component-import key="securityService" interface="com.atlassian.bitbucket.user.SecurityService" filter=""/>
-    <component-import key="permissionAdminService" interface="com.atlassian.bitbucket.permission.PermissionAdminService"
-                      filter=""/>
-    <component-import key="userService" interface="com.atlassian.bitbucket.user.UserService" filter=""/>
-    <component-import key="refRestrictionService" interface="com.atlassian.bitbucket.repository.ref.restriction.RefRestrictionService" filter=""/>
-    <component-import key="soyTemplateRenderer" interface="com.atlassian.soy.renderer.SoyTemplateRenderer" filter=""/>
+
+
+    <!--&lt;!&ndash; import from the product container &ndash;&gt;-->
+    <!--<component-import key="projectService" interface="com.atlassian.bitbucket.project.ProjectService" filter=""/>-->
+    <!--<component-import key="repositoryService" interface="com.atlassian.bitbucket.repository.RepositoryService" filter=""/>-->
+    <!--<component-import key="securityService" interface="com.atlassian.bitbucket.user.SecurityService" filter=""/>-->
+    <!--<component-import key="permissionAdminService" interface="com.atlassian.bitbucket.permission.PermissionAdminService"-->
+                      <!--filter=""/>-->
+    <!--<component-import key="userService" interface="com.atlassian.bitbucket.user.UserService" filter=""/>-->
+    <!--<component-import key="refRestrictionService" interface="com.atlassian.bitbucket.repository.ref.restriction.RefRestrictionService" filter=""/>-->
+    <!--<component-import key="soyTemplateRenderer" interface="com.atlassian.soy.renderer.SoyTemplateRenderer" filter=""/>-->
+
     <servlet name="Project Permissions Servlet" i18n-name-key="project-permissions-servlet.name"
-             key="project-permissions-servlet" class="com.orbitz.bitbucket.plugins.pvp.servlet.ProjectPermissionsServlet">
+             key="project-permissions-servlet" class="dk.kb.bitbucket.plugins.pvp.servlet.ProjectPermissionsServlet">
         <description key="project-permissions-servlet.description">The Project Permissions Servlet Plugin</description>
         <url-pattern>/projectpermissions/*</url-pattern>
     </servlet>
     <servlet name="Repository Permissions Servlet" i18n-name-key="repository-permissions-servlet.name"
              key="repository-permissions-servlet"
-             class="com.orbitz.bitbucket.plugins.pvp.servlet.RepositoryPermissionsServlet">
+             class="dk.kb.bitbucket.plugins.pvp.servlet.RepositoryPermissionsServlet">
         <description key="repository-permissions-servlet.description">The Repository Permissions Servlet Plugin
         </description>
         <url-pattern>/repositorypermissions/*</url-pattern>
@@ -52,7 +55,7 @@
         <link>/plugins/servlet/repositorypermissions/${repository.id}</link>
         <tooltip key="repository.permissions.plugin.tab.description">View Permissions</tooltip>
         <param name="iconClass">aui-icon aui-icon-small aui-iconfont-unlocked</param>
-    </web-item>exit
+    </web-item>
 
     <client-resource key="soy-templates" name="Soy Templates">
         <directory location="/templates/"/>
